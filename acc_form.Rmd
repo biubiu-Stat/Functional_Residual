@@ -184,15 +184,15 @@ OPTIONAL: System/hardware requirements including operating system with version n
 
 - [ ] No parallel code used
 - [x] Multi-core parallelization on a single machine/node
-    - Number of cores used: 
+    - Number of cores used: 9
 - [ ] Multi-machine/multi-node parallelization 
     - Number of nodes and cores used: 
 
 ### License
 
-- [x] MIT License (default)
+- [ ] MIT License (default)
 - [ ] BSD 
-- [ ] GPL v3.0
+- [x] GPL v3.0
 - [ ] Creative Commons
 - [ ] Other: (please specify)
 
@@ -227,8 +227,8 @@ The workflow is available:
 <!--
 Check all that apply, and in the case of a Git repository include unique identifier, such as specific commit ID, branch, release, or tag.
 -->
-- [x] As part of the paper’s supplementary material.
-- [ ] In this Git repository:
+- [ ] As part of the paper’s supplementary material.
+- [x] In this Git repository: [Private repository link ](https://github.com/biubiu-Stat/JASA-T-M-2023-0555.R1.git). We will make the materials publicly available upon publication. For the review process, they are included as a zip file in the supplementary materials.
 - [ ] Other (please specify):
 
 <!--
@@ -241,10 +241,10 @@ Indicate where the materials (generally including the code, unless in a separate
 <!--
 Check all that apply
 -->
-- [x] Single master code file 
+- [ ] Single master code file 
 - [ ] Wrapper (shell) script(s)
 - [ ] Self-contained R Markdown file, Jupyter notebook, or other literate programming approach
-- [ ] Text file (e.g., a readme-style file) that documents workflow
+- [x] Text file (e.g., a readme-style file) that documents workflow
 - [ ] Makefile
 - [ ] Other (more detail in *Instructions* below)
 
