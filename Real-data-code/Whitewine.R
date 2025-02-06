@@ -8,169 +8,50 @@ library(MASS)
 library(dplyr)
 library(gridExtra)
 library(mgcv)
+source("./functions/ffplot.R")
+source("./functions/fresiduals.R")
+source("./functions/fresplot.R")
 ##########################################################################
 ##########################################################################
-###################################build model############################
+######################White Wine Data Analysis############################
 ##########################################################################
 ##########################################################################
 set.seed(3)
 
-whitewine<-read.csv("../Real-data/winequality-white.csv",sep = ";")
+whitewine<-read.csv("./Real-data/winequality-white.csv",sep = ";")
 
-#alcohol+volatile.acidity+residual.sugar+free.sulfur.dioxide+density+pH+sulphates+fixed.acidity+citric.acid
 model1<- vglm(quality~volatile.acidity+
                 alcohol+sulphates+fixed.acidity+
                 residual.sugar+free.sulfur.dioxide+
                 pH+density,
               family=acat(reverse=TRUE, parallel=TRUE),data =whitewine)
 
-#alcohol+volatile.acidity+residual.sugar+free.sulfur.dioxide+density+pH+sulphates+fixed.acidity+citric.acid+free.sulfur.dioxide2
-
 ################################Initial Model for Table S1######################
 summary(model1)
 
 ################################Functional Residual for Initial Model###########
+fr1_whitewine<-fresiduals(model1)
 
-n<-nrow(model1@y)
-probmodel1<-cbind.data.frame(rep(0,nrow(model1@y)),fitted(model1))
-probrange1<-matrix(NA,nrow =nrow(model1@y) ,ncol=2)
-y<-as.numeric(apply(model1@y, 1, function(t) colnames(model1@y)[which.max(t)]))
-ordery<-y-min(y)+1
-# range for the functional residual
-for (i in 1:length(y)) {
-  probrange1[i,]<-c(sum(probmodel1[i,1:ordery[i]]),sum(probmodel1[i,1:(ordery[i]+1)]))
-}
 #######heatmap part
 
-prenumber<-matrix(NA,nrow=n,ncol = 11)
-for (h in 1:n) {
-  for (a in 1:ncol(prenumber)) {
-    prenumber[h,a]<-probrange1[h,1]+(probrange1[h,2]-probrange1[h,1])/10*(a-1)
-  }
-}
-prenumber_vector<-as.vector(prenumber)
+heatmap2_norm<-fresplot(fr1_whitewine,whitewine$fixed.acidity,
+                        scale ="normal",
+                        xl=4,xp=15,heatmapcut = 11,
+                        title = "(a) fixed.acidity",xlabs = "")
 
 
-q_prenumber_vector<-qnorm(prenumber_vector)
+heatmap5_norm<-fresplot(fr1_whitewine,whitewine$residual.sugar,
+                        scale ="normal",
+                        xl=0,xp=70,heatmapcut = 11,yl=-4,yp=4,
+                        title = "(b) residual.sugar",xlabs = "")
 
-repchlorides<-rep(whitewine$chlorides,11)
-repfixed.acidity<-rep(whitewine$fixed.acidity,11)
-repvolatile.acidity<-rep(whitewine$volatile.acidity,11)
-repcitric.acid<-rep(whitewine$citric.acid,11)
-represidual.sugar<-rep(whitewine$residual.sugar,11)
-repfree.sulfur.dioxide<-rep(whitewine$free.sulfur.dioxide,11)
-reptotal.sulfur.dioxide<-rep(whitewine$total.sulfur.dioxide,11)
-repdensity<-rep(whitewine$density,11)
-reppH<-rep(whitewine$pH,11)
-repsulphates<-rep(whitewine$sulphates,11)
-repalcohol<-rep(whitewine$alcohol,11)
+min(whitewine$density)
 
-
-
-heatmapdata<-cbind.data.frame(repchlorides,repfixed.acidity,repvolatile.acidity,
-                              repcitric.acid,represidual.sugar,
-                              repfree.sulfur.dioxide,reptotal.sulfur.dioxide,
-                              repdensity,reppH,repalcohol,repsulphates,q_prenumber_vector)
-
-heatmap1_norm<-ggplot(heatmapdata, aes(repchlorides,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("chlorides")+ylab("")+
-  labs(title = "Functional residuals")
-
-heatmap2_norm<-ggplot(heatmapdata, aes(repfixed.acidity,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "(a) fixed.acidity")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap3_norm<-ggplot(heatmapdata, aes(repvolatile.acidity,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = " volatile.acidity")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap4_norm<-ggplot(heatmapdata, aes(repcitric.acid,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("citric.acid")+ylab("")+
-  labs(title = "Functional residuals")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap5_norm<-ggplot(heatmapdata, aes(represidual.sugar,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "(b) residual.sugar")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap6_norm<-ggplot(heatmapdata, aes(repfree.sulfur.dioxide,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+ylim(-5,3)+
-  labs(title = "free.sulfur.dioxide")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-
-
-heatmap7_norm<-ggplot(heatmapdata, aes(reptotal.sulfur.dioxide,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("total.sulfur.dioxide")+ylab("")+
-  labs(title = "Functional residuals")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap8_norm<-ggplot(heatmapdata, aes(repdensity,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "(c) density")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap9_norm<-ggplot(heatmapdata, aes(reppH,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "pH")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap10_norm<-ggplot(heatmapdata, aes(repalcohol,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "alcohol")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap11_norm<-ggplot(heatmapdata, aes(repsulphates,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "sulphates")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
+max(whitewine$density)
+heatmap8_norm<-fresplot(fr1_whitewine,whitewine$density,
+                        scale ="normal",
+                        xl=0.985,xp=1.04,heatmapcut = 11,yl=-4,yp=4,
+                        title = "(c) density",xlabs = "")
 
 ##########################################################################
 ###############################Figure S11#################################
@@ -195,41 +76,28 @@ par(mfrow = c(1, 1))
 
 
 #############delete outlier
-heatmapdata<-heatmapdata %>%
-  filter(represidual.sugar<=50)
 
-heatmapdata<-heatmapdata %>%
-  filter(repdensity<1.01)
+whitewine_rmout<-cbind.data.frame(fr1_whitewine,whitewine) %>%
+  filter(residual.sugar<=50) %>%
+  filter(density<1.01) %>%
+  filter(fixed.acidity<11)
+fr1_update<-as.matrix(whitewine_rmout[,1:2])
 
-heatmapdata<-heatmapdata %>%
-  filter(repfixed.acidity<11)
+heatmap2_norm_v2<-fresplot(fr1_update,whitewine_rmout$fixed.acidity,
+                           scale ="normal",
+                           xl=4,xp=11,heatmapcut = 11,
+                           title = "(a*) fixed.acidity",xlabs = "")
+  
+heatmap5_norm_v2<-fresplot(fr1_update,whitewine_rmout$residual.sugar,
+                           scale ="normal",
+                           xl=0,xp=24,heatmapcut = 11,yl=-4,yp=4,
+                           title = "(b*) residual.sugar",xlabs = "")
 
-heatmap2_norm_v2<-ggplot(heatmapdata, aes(repfixed.acidity,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "(a*) fixed.acidity")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
+heatmap8_norm_v2<-fresplot(fr1_update,whitewine_rmout$density,
+                           scale ="normal",yl=-4,yp=4,
+                           xl=0.986,xp=1.003,heatmapcut = 11,
+                           title = "(c*) density",xlabs = "")
 
-heatmap5_norm_v2<-ggplot(heatmapdata, aes(represidual.sugar,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "(b*) residual.sugar")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
-
-heatmap8_norm_v2<-ggplot(heatmapdata, aes(repdensity,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+
-  labs(title = "(c*) density")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
 ####################################################
 #####################Figure S10#####################
 ####################################################
@@ -240,24 +108,15 @@ grid.arrange(heatmap2_norm,heatmap5_norm,heatmap8_norm,
 
 
 #################### Add square term #######################
-whitewine<-read.csv("../Real-data/winequality-white.csv",sep = ";")
-whitewine<-whitewine %>%
-  filter(residual.sugar<=50)
 
-whitewine<-whitewine %>%
-  filter(density<1.01)
-
-whitewine<-whitewine %>%
-  filter(fixed.acidity<11)
-whitewine$free.sulfur.dioxide2<-whitewine$free.sulfur.dioxide^2
+whitewine_rmout$free.sulfur.dioxide2<-whitewine_rmout$free.sulfur.dioxide^2
 
 model2<- vglm(quality~volatile.acidity+
                 alcohol+sulphates+fixed.acidity+
                 residual.sugar+free.sulfur.dioxide+
                 pH+density+free.sulfur.dioxide2,
-              family=acat(reverse=TRUE, parallel=TRUE),data =whitewine)
+              family=acat(reverse=TRUE, parallel=TRUE),data =whitewine_rmout)
 
-#alcohol+volatile.acidity+residual.sugar+free.sulfur.dioxide+density+pH+sulphates+fixed.acidity+citric.acid+free.sulfur.dioxide2
 ################################Final Model for Table S1######################
 
 summary(model2)
@@ -268,60 +127,22 @@ summary(model2)
 
 
 
-n<-nrow(model2@y)
-probmodel2<-cbind.data.frame(rep(0,nrow(model2@y)),fitted(model2))
-probrange2<-matrix(NA,nrow =nrow(model2@y) ,ncol=2)
-y<-as.numeric(apply(model2@y, 1, function(t) colnames(model2@y)[which.max(t)]))
-ordery<-y-min(y)+1
-for (i in 1:length(y)) {
-  probrange2[i,]<-c(sum(probmodel2[i,1:ordery[i]]),sum(probmodel2[i,1:(ordery[i]+1)]))
-}
+################################Functional Residual for Updated Model###########
+fr2_whitewine<-fresiduals(model2)
 
-prenumber2<-matrix(NA,nrow=n,ncol = 11)
-for (h in 1:n) {
-  for (a in 1:ncol(prenumber2)) {
-    prenumber2[h,a]<-probrange2[h,1]+(probrange2[h,2]-probrange2[h,1])/10*(a-1)
-  }
-}
-prenumber_vector2<-as.vector(prenumber2)
-q_prenumber_vector2<-qnorm(prenumber_vector2)
-
-repchlorides<-rep(whitewine$chlorides,11)
-repfixed.acidity<-rep(whitewine$fixed.acidity,11)
-repvolatile.acidity<-rep(whitewine$volatile.acidity,11)
-repcitric.acid<-rep(whitewine$citric.acid,11)
-represidual.sugar<-rep(whitewine$residual.sugar,11)
-repfree.sulfur.dioxide<-rep(whitewine$free.sulfur.dioxide,11)
-reptotal.sulfur.dioxide<-rep(whitewine$total.sulfur.dioxide,11)
-repdensity<-rep(whitewine$density,11)
-reppH<-rep(whitewine$pH,11)
-repsulphates<-rep(whitewine$sulphates,11)
-repalcohol<-rep(whitewine$alcohol,11)
+heatmapbefore<-fresplot(fr1_update,whitewine_rmout$free.sulfur.dioxide,
+                        scale ="normal",
+                        xl=0,xp=300,heatmapcut = 11,yl=-5,yp=5,
+                        title = "(a) before",xlabs = "")
 
 
 
-heatmapdata2<-cbind.data.frame(repchlorides,repfixed.acidity,repvolatile.acidity,
-                              repcitric.acid,represidual.sugar,
-                              repfree.sulfur.dioxide,reptotal.sulfur.dioxide,
-                              repdensity,reppH,repalcohol,repsulphates,q_prenumber_vector2)
+heatmap_norm_after_quard<-fresplot(fr2_whitewine,whitewine_rmout$free.sulfur.dioxide,
+                                   scale ="normal",
+                                   xl=0,xp=300,heatmapcut = 11,yl=-5,yp=5,
+                                   title = "(b) after",xlabs = "")
 
-heatmapbefore<-ggplot(heatmapdata, aes(repfree.sulfur.dioxide,q_prenumber_vector)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+ylim(-5,5)+
-  labs(title = "(a) before")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
 
-heatmap_norm_after_quard<-ggplot(heatmapdata2, aes(repfree.sulfur.dioxide,q_prenumber_vector2)) +
-  stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
-  scale_fill_viridis_c(name = "density")+
-  geom_hline(yintercept=0,linetype="dashed", color = "red")+
-  geom_smooth(method = "loess",se=FALSE)+
-  xlab("")+ylab("")+ylim(-3,3)+
-  labs(title = "(b) after")+
-  theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
 
 ####################################################
 #####################Figure S12#####################
