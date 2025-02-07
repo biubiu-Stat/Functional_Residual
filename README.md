@@ -6,7 +6,6 @@ Code to reproduce simulation results, figures and real data analysis results fro
 ### Functions
 
 # R Functions for Model Diagnostics
-# R Functions for Model Diagnostics
 
 To provide code that actually implements the method, we have created the following R functions.
 
