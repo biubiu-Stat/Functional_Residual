@@ -367,15 +367,14 @@ generalized linear models and beyond”</p>
 the following R functions.</p>
 <ul>
 <li><p><strong><code>fresiduals</code></strong> is a function for
-producing functional residuals. More specifically, it yields $ (y-1;) $
-and $ (y;) $ that are used to define a functional residual in Equation
-(2) on page 6 of the manuscript. The input is a fitted model, which can
-be a <code>vglm</code>, <code>glm</code>, <code>tsglm</code>, or
-<code>zeroinfl</code> object. This function generates an $ n $ matrix as
-its output, where $ n $ rows correspond to the $ n $ observations, and 2
-columns correspond to $ (y - 1; ) $ and $ (y; ) $ for each observation.
-This output can be called by other functions to generate model
-diagnostics results.</p>
+producing functional residuals. More specifically, it yields <span class="math inline">\(\pi(y-1;\mathbf{x})\)</span> and <span class="math inline">\(\pi(y;\mathbf{x})\)</span> that are used to define
+a functional residual in Equation (2) on page 6 of the manuscript. The
+input is a fitted model, which can be a <code>vglm</code>,
+<code>glm</code>, <code>tsglm</code>, or <code>zeroinfl</code> object.
+This function generates an $ n $ matrix as its output, where $ n $ rows
+correspond to the $ n $ observations, and 2 columns correspond to $ (y -
+1; ) $ and $ (y; ) $ for each observation. This output can be called by
+other functions to generate model diagnostics results.</p>
 <pre class="r"><code># Example usage:
 bikedata &lt;- read.csv(&quot;hour.csv&quot;)
 model &lt;- glm(cnt ~ ., family = &quot;poisson&quot;, data = bikedata)

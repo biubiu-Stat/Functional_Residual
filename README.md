@@ -7,7 +7,7 @@ Code to reproduce simulation results, figures and real data analysis results fro
 
 To provide code that actually implements the method, we have created the following R functions.
 
-- **`fresiduals`** is a function for producing functional residuals. More specifically, it yields $ \pi(y-1;\mathbf{x}) $ and $ \pi(y;\mathbf{x}) $ that are used to define a functional residual in Equation (2) on page 6 of the manuscript. The input is a fitted model, which can be a `vglm`, `glm`, `tsglm`, or `zeroinfl` object. This function generates an $ n \times 2 $ matrix as its output, where $ n $ rows correspond to the $ n $ observations, and 2 columns correspond to $ \pi(y - 1; \mathbf{x}) $ and $ \pi(y; \mathbf{x}) $ for each observation. This output can be called by other functions to generate model diagnostics results.
+- **`fresiduals`** is a function for producing functional residuals. More specifically, it yields $\pi(y-1;\mathbf{x})$ and $\pi(y;\mathbf{x})$ that are used to define a functional residual in Equation (2) on page 6 of the manuscript. The input is a fitted model, which can be a `vglm`, `glm`, `tsglm`, or `zeroinfl` object. This function generates an $ n \times 2 $ matrix as its output, where $ n $ rows correspond to the $ n $ observations, and 2 columns correspond to $ \pi(y - 1; \mathbf{x}) $ and $ \pi(y; \mathbf{x}) $ for each observation. This output can be called by other functions to generate model diagnostics results.
 
   ```r
   # Example usage:
