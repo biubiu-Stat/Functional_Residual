@@ -44,6 +44,15 @@ To provide code that actually implements the method, we have created the followi
 
 - **`ffplot.envelop`** generates an $F_n$- $F_n$ plot with a ``probable envelop".  The envelope is formed by creating confidence bounds around the $F_n$- $F_n$ curve. At any given point $t$, it reduces to a confidence interval for $\overline{Res}(t)$ in (4) of the manuscript (with a pre-specified error rate $\alpha$). Specifically, the envelop is the set <img src="https://latex.codecogs.com/svg.image?$\mathcal{E}_{1-\alpha}=\{(L^*_{\alpha/2}(t),U^*_{1-\alpha/2}(t)),t\in(0,1)\}$" />, where <img src="https://latex.codecogs.com/svg.image?$L^*_{\alpha/2}(t)$"/> and <img src="https://latex.codecogs.com/svg.image?$U^*_{1-\alpha/2}(t)$"/> are lower and upper bounds constructed using the bootstrap method (see Supplementary Materials G to the paper). If the 45-degree line falls outside <img src="https://latex.codecogs.com/svg.image?$\mathcal{E}_{1-\alpha}$"/>, this may be regarded as evidence against the null that the model is correct.
 
+ - **`model`**: the object of the fitted model.
+  - **`B`**: the number of bootstrap samples for the graphical test. The default is 2000.
+  - **`alpha`**: the error rate of the envelop. The default is 0.05.
+  ```r
+  ffplot.envelop(model = model,
+                 B = 2000,
+                 alpha=0.05,
+                 title = "Fn-Fn plot with test envelop") 
+  ```
 ### Simulation-code
 
 #### Illustration Figures
