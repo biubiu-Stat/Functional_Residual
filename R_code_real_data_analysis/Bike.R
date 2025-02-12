@@ -20,13 +20,13 @@ bikedata<-read.csv(here::here("./Datasets/hour.csv"))
 bikedata<-bikedata %>% 
   filter(yr==1)
 
-### Create a new variable called "winter" as our analysis 
-### shows the winter season is different from other seasons.
+### Create a new variable called "winter" as our analysis shows 
+### the winter season is different from other seasons.
 bikedata$winter<-ifelse(bikedata$season==1,1,0)
 
 ### Initial model
-#### The variables holiday, weekday, atemp, and season are not included 
-#### in the model because their information is captured by other explanatory variables.
+#### The variables holiday, weekday, atemp, and season are not included in the model
+#### because their information is captured by other explanatory variables.
 model1<-glm(cnt~winter+hr+workingday+weathersit+
               temp+hum+windspeed,family = "poisson",data = bikedata) 
 

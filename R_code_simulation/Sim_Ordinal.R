@@ -1,7 +1,7 @@
 ###################adjacent-category model examples 1-4###########################
-source("./functions/ffplot.R")
-source("./functions/fresiduals.R")
-source("./functions/fresplot.R")
+source("./R_functions/ffplot.R")
+source("./R_functions/fresiduals.R")
+source("./R_functions/fresplot.R")
 library(VGAM)
 library(brglm2)
 library(ggplot2)

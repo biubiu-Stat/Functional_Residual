@@ -12,7 +12,8 @@ To provide code that actually implements the method, we have created the followi
   ```r
   # Example usage:
   bikedata <- read.csv("hour.csv")
-  model <- glm(cnt ~ ., family = "poisson", data = bikedata)
+  model <- glm(cnt~hr+workingday+weathersit+
+              temp+hum+windspeed,family = "poisson",data = bikedata)
   FR <- fresiduals(model)
   ```
 
