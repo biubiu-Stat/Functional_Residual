@@ -54,15 +54,15 @@ To provide code that actually implements the method, we have created the followi
                  alpha=0.05,
                  title = "Fn-Fn plot with test envelop") 
   ```
-### Simulation-code
+### R_code_simulation
 
 #### Illustration Figures
 
-- "Sim_Illustration.R" contains R code for Figure 1-3 in Section 2.3
+- "Sim_Figure1-3.R" contains R code for Figure 1-3 in Section 2.3
 
 #### Simulation for ordinal data
 
-- "Sim_Ordinal_Data.R" contains R code for 
+- "Sim_Ordinal.R" contains R code for 
 
    - Figure 4-5 in Section 3.1;
    - Figure S1-S4 in Supplementary Materials B;
@@ -70,13 +70,13 @@ To provide code that actually implements the method, we have created the followi
 
 #### Simulation for count data
 
-- "Sim_Count_Data.R" contains R code for 
+- "Sim_Count.R" contains R code for 
    - Figure S5-S9 in Supplementary Materials B;
    - Figure S17-S19 in Supplementary Materials D.
    
 #### Simulation Graphical Test
 
-- "Sim_Graphical_test.R" contains R code for Figure S23 in Supplementary Materials G;
+- "Sim_Graphical_Test.R" contains R code for Figure S23 in Supplementary Materials G;
 - "Sim_Power_Comparison.R" contains R code for producing the results displayed in Table S4 in Supplementary Materials G.
 
 ### Simulation-results
@@ -84,13 +84,13 @@ To provide code that actually implements the method, we have created the followi
 Contains the results from running the code in the simulation-code folder as described above. 
 
 
-### Real-data
+### Datasets
 
 * "winequality-white.csv" contains the real data set in Section 5.1. Detailed information about this dataset can be accessed [here](https://archive.ics.uci.edu/dataset/186/wine+quality). 
 
 * "hour.csv" contains the real data set in Section 5.2. Detailed information about this dataset can be accessed [here](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset). 
 
-### Real-data-code
+### R_code_real_data_analysis
 - "Whitewine.R" contains the code to run real data analysis in Section 5.1. It produces 
    - Figure S10-S12 in Supplementary Materials B;
    - Table S1 in Supplementary Materials C.
