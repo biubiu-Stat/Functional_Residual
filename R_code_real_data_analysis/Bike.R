@@ -8,31 +8,38 @@ library(MASS)
 library(dplyr)
 library(gridExtra)
 library(mgcv)
-source("./functions/ffplot.R")
-source("./functions/fresiduals.R")
-source("./functions/fresplot.R")
+source("./R_functions/ffplot.R")
+source("./R_functions/fresiduals.R")
+source("./R_functions/fresplot.R")
 
 
 set.seed(3)
-bikedata<-read.csv(here::here("./Real-data/hour.csv"))
+bikedata<-read.csv(here::here("./Datasets/hour.csv"))
 
 ### Our analysis focuses on the 2012 data (Selecting the 2012 data).
 bikedata<-bikedata %>% 
   filter(yr==1)
 
-### Create the winter variable
+### Create a new variable called "winter" as our analysis 
+### shows the winter season is different from other seasons.
 bikedata$winter<-ifelse(bikedata$season==1,1,0)
 
-
-#1. information is contained/absorbed
-
-### Initial model with all the variables
+### Initial model
+#### The variables holiday, weekday, atemp, and season are not included 
+#### in the model because their information is captured by other explanatory variables.
 model1<-glm(cnt~winter+hr+workingday+weathersit+
-              temp+hum+windspeed,family = "poisson",data = bikedata) # the remaining variables are....
+              temp+hum+windspeed,family = "poisson",data = bikedata) 
+
+
 ## Functional residuals
 fr1 <- fresiduals(model1)
-#####Initial model for Table S3 #####
+#####Fitting results of the initial model  (see Table S3)#####
 summary(model1)
+
+###############################################################################
+############### Figure S13 Functional-residual-vs-covariate plots 
+############### for the initial Poisson model fitted to the Captial Bikeshare dataset.
+###############################################################################
 
 heatmap_winter<-fresplot(fr1,bikedata$winter,
                          title = "(e) winter",scale = "normal",xl=0,xp=1,
@@ -62,10 +69,7 @@ heatmap_windspeed<-fresplot(fr1, bikedata$windspeed,
                             xl=0, xp=0.8,
                             xlabs = "", heatmapcut=11)
 
-###############################################################################
-############### Figure S13 Functional-residual-vs-covariate plots 
-############### for the initial Poisson model fitted to the Captial Bikeshare dataset.
-###############################################################################
+
 grid.arrange(heatmap_hour,heatmap_temp,heatmap_humidity,heatmap_windspeed,
              heatmap_winter,
              heatmap_workingday,ncol=2)
@@ -75,7 +79,7 @@ grid.arrange(heatmap_hour,heatmap_temp,heatmap_humidity,heatmap_windspeed,
 ff1<-ffplot(fr1,title = "(a) Initial model")
 
 
-########## Additive Poisson model
+########## Generalized additive Poisson model
 
 
 model_gam<-gam(cnt~winter+s(hr)+workingday+weathersit+
@@ -83,18 +87,16 @@ model_gam<-gam(cnt~winter+s(hr)+workingday+weathersit+
             family = poisson,
             data = bikedata)
 
-######### Functional residuals for Additive Poisson model
+######### Functional residuals for Generalized additive Poisson model
 
 fr2<-fresiduals(model_gam)
 
-
-
-
+#############################################################
+########Figure S15 Functional-residual-vs-covariate plots after adding the smoothing functions.
+#############################################################
 heatmap2_norm_gam<-fresplot(fr2, bikedata$hr,
                             title = "(a) hour",scale = "normal",xl=0, xp=24,
                             xlabs = "", heatmapcut=11)
-
-
 
 heatmap5_norm_gam<-fresplot(fr2, bikedata$temp,
                             title = "(b) temp",scale = "normal",
@@ -110,16 +112,14 @@ heatmap7_norm_gam<-fresplot(fr2, bikedata$windspeed,
                             title = "(d) windspeed",scale = "normal",
                             xl=0, xp=0.8,
                             xlabs = "", heatmapcut=11)
-###############################################################################
-###############################Figure S15 Functional-residual-vs-covariate plots after adding the smoothing functions#####################################
-###############################################################################
+
 
 grid.arrange(heatmap2_norm_gam,heatmap5_norm_gam,heatmap6_norm_gam,
              heatmap7_norm_gam,nrow=2)
 ########### Fn-Fn for Intermediate#########
 ff2<-ffplot(fr2,title = "(b) Intermediate model")
 
-#####quasipoisson
+#####Generalized additive quasi-Poisson model
 
 
 model_gam_quasi<-gam(cnt~winter+s(hr)+workingday+weathersit+
@@ -128,47 +128,44 @@ model_gam_quasi<-gam(cnt~winter+s(hr)+workingday+weathersit+
                data = bikedata)
 fr3<- fresiduals(model_gam_quasi)
 
-############### Final model for Table S3 ###############
+###### Fitting results of the final model (see Table S3) ###############
 summary(model_gam_quasi)
+
+########################################################################
+#########Figure S16 Functional-residual-vs-covariate plots for the final model.#########################
+########################################################################
 set.seed(3)
 heatmap_winter_gam_quasi<-fresplot(fr3,bikedata$winter ,
-                         title = "(e) winter",scale = "normal",xl=0,xp=1.01,
-                         xlabs = "", heatmapcut=11,is.binary=TRUE)
+                                   title = "(e) winter",scale = "normal",xl=0,xp=1.01,
+                                   xlabs = "", heatmapcut=11,is.binary=TRUE)
 
 
 heatmap_hour_gam_quasi<-fresplot(fr3, bikedata$hr,
-                       title = "(a) hour",scale = "normal",xl=0, xp=24,
-                       xlabs = "", heatmapcut=11)
+                                 title = "(a) hour",scale = "normal",xl=0, xp=24,
+                                 xlabs = "", heatmapcut=11)
 
 
 heatmap_workingday_gam_quasi<-fresplot(fr3, bikedata$workingday,
-                             title = "(f) workingday",scale = "normal",
-                             xl=0, xp=1,
-                             xlabs = "", heatmapcut=11)
+                                       title = "(f) workingday",scale = "normal",
+                                       xl=0, xp=1,
+                                       xlabs = "", heatmapcut=11)
 
 
 heatmap_temp_gam_quasi<-fresplot(fr3, bikedata$temp,
-                       title = "(b) temp",scale = "normal",
-                       xl=0, xp=1,
-                       xlabs = "", heatmapcut=11)
+                                 title = "(b) temp",scale = "normal",
+                                 xl=0, xp=1,
+                                 xlabs = "", heatmapcut=11)
 
 heatmap_humidity_gam_quasi<-fresplot(fr3, bikedata$hum,
-                           title = "(c) humidity",scale = "normal",
-                           xl=0.16, xp=1,
-                           xlabs = "", heatmapcut=11)
+                                     title = "(c) humidity",scale = "normal",
+                                     xl=0.16, xp=1,
+                                     xlabs = "", heatmapcut=11)
 
 
 heatmap_windspeed_gam_quasi<-fresplot(fr3, bikedata$windspeed,
-                            title = "(d) windspeed",scale = "normal",
-                            xl=0, xp=0.8,
-                            xlabs = "", heatmapcut=11)
-
-
-
-
-########################################################################
-####################################Figure S16 Functional-residual-vs-covariate plots for the final model.#########################
-########################################################################
+                                      title = "(d) windspeed",scale = "normal",
+                                      xl=0, xp=0.8,
+                                      xlabs = "", heatmapcut=11)
 
 grid.arrange(heatmap_hour_gam_quasi,heatmap_temp_gam_quasi,
              heatmap_humidity_gam_quasi,heatmap_windspeed_gam_quasi,
@@ -176,7 +173,7 @@ grid.arrange(heatmap_hour_gam_quasi,heatmap_temp_gam_quasi,
              heatmap_workingday_gam_quasi,ncol=2)
 
 
-######Fn-Fn
+######Fn-Fn plot
 
 ff3<-ffplot(fr3,title="(c) Final model")
 

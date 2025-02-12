@@ -24,7 +24,7 @@ fresplot <- function(fresiduals,
   # Replicate x to match the number of rows in numbers
   x_101 <- rep(x, heatmapcut)
   if (is.binary==TRUE){
-    x_101<-x_101+runif(heatmapcut,0,0.01)
+    x_101<-x_101+runif(length(x_101),min=0,max=0.01)
   }
   # Convert the matrix to a vector and then apply the normal quantile transformation
   numbers_v <- as.vector(numbers)
