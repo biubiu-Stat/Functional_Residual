@@ -8,9 +8,9 @@ library(MASS)
 library(dplyr)
 library(gridExtra)
 library(mgcv)
-source("./functions/ffplot.R")
-source("./functions/fresiduals.R")
-source("./functions/fresplot.R")
+source("./R_functions/ffplot.R")
+source("./R_functions/fresiduals.R")
+source("./R_functions/fresplot.R")
 ##########################################################################
 ##########################################################################
 ######################White Wine Data Analysis############################
@@ -18,7 +18,7 @@ source("./functions/fresplot.R")
 ##########################################################################
 set.seed(3)
 
-whitewine<-read.csv("./Real-data/winequality-white.csv",sep = ";")
+whitewine<-read.csv("./Datasets/winequality-white.csv",sep = ";")
 
 model1<- vglm(quality~volatile.acidity+
                 alcohol+sulphates+fixed.acidity+
@@ -26,14 +26,13 @@ model1<- vglm(quality~volatile.acidity+
                 pH+density,
               family=acat(reverse=TRUE, parallel=TRUE),data =whitewine)
 
-################################Initial Model for Table S1######################
+################Fitting results of the initial model  (see Table S1)######################
 summary(model1)
 
 ################################Functional Residual for Initial Model###########
 fr1_whitewine<-fresiduals(model1)
 
-#######heatmap part
-
+#### Functional-residual-vs-covariate plots
 heatmap2_norm<-fresplot(fr1_whitewine,whitewine$fixed.acidity,
                         scale ="normal",
                         xl=4,xp=15,heatmapcut = 11,
@@ -55,7 +54,7 @@ heatmap8_norm<-fresplot(fr1_whitewine,whitewine$density,
 
 ##########################################################################
 ###############################Figure S11#################################
-##########################################################################
+###Boxplots of the variables that may contain outliers in the wine quality dataset.#############################
 
 par(mfrow = c(2, 2))
 
@@ -83,6 +82,11 @@ whitewine_rmout<-cbind.data.frame(fr1_whitewine,whitewine) %>%
   filter(fixed.acidity<11)
 fr1_update<-as.matrix(whitewine_rmout[,1:2])
 
+####################################################
+#####Figure S10 Functional-residual-vs-covariate plots before and after
+#####deleting the outliers from the wine quality dataset.
+####################################################
+
 heatmap2_norm_v2<-fresplot(fr1_update,whitewine_rmout$fixed.acidity,
                            scale ="normal",
                            xl=4,xp=11,heatmapcut = 11,
@@ -98,9 +102,7 @@ heatmap8_norm_v2<-fresplot(fr1_update,whitewine_rmout$density,
                            xl=0.986,xp=1.003,heatmapcut = 11,
                            title = "(c*) density",xlabs = "")
 
-####################################################
-#####################Figure S10#####################
-####################################################
+
 
 grid.arrange(heatmap2_norm,heatmap5_norm,heatmap8_norm,
              heatmap2_norm_v2,heatmap5_norm_v2,heatmap8_norm_v2,nrow=2)
@@ -117,7 +119,7 @@ model2<- vglm(quality~volatile.acidity+
                 pH+density+free.sulfur.dioxide2,
               family=acat(reverse=TRUE, parallel=TRUE),data =whitewine_rmout)
 
-################################Final Model for Table S1######################
+##### Fitting results of the final model  (see Table S1)######################
 
 summary(model2)
 
@@ -127,8 +129,13 @@ summary(model2)
 
 
 
-################################Functional Residual for Updated Model###########
+############Functional Residual for Updated Model###########
 fr2_whitewine<-fresiduals(model2)
+
+####################################################
+#####################Figure S12#####################
+###Plots of functional residuals versus free.sulfur.dioxide before and after adding
+###its quadratic term to the model.
 
 heatmapbefore<-fresplot(fr1_update,whitewine_rmout$free.sulfur.dioxide,
                         scale ="normal",
@@ -143,9 +150,5 @@ heatmap_norm_after_quard<-fresplot(fr2_whitewine,whitewine_rmout$free.sulfur.dio
                                    title = "(b) after",xlabs = "")
 
 
-
-####################################################
-#####################Figure S12#####################
-####################################################
 multiplot(heatmapbefore,heatmap_norm_after_quard,cols = 2) 
 
