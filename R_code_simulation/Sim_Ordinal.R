@@ -132,6 +132,8 @@ pearson2<-resid(model2,type="pearson")[,1]
 otherres1<-cbind.data.frame(x1,sign1,deviance1,pearson1,g1)
 otherres2<-cbind.data.frame(x1,sign2,deviance2,pearson2,g2)
 
+
+########### Figure 4, 5, and S1########
 fresplot1_unif <- fresplot(fr1,
                            x1,
                            title="(a) Functional residuals on the uniform scale",

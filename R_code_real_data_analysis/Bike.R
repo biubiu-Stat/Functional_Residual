@@ -135,6 +135,8 @@ summary(model_gam_quasi)
 #########Figure S16 Functional-residual-vs-covariate plots for the final model.#########################
 ########################################################################
 set.seed(3)
+
+
 heatmap_winter_gam_quasi<-fresplot(fr3,bikedata$winter ,
                                    title = "(e) winter",scale = "normal",xl=0,xp=1.01,
                                    xlabs = "", heatmapcut=11,is.binary=TRUE)

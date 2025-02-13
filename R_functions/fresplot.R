@@ -21,14 +21,39 @@ fresplot <- function(fresiduals,
     }
   }
   
+  numbers_v <- as.vector(numbers)
+  qnumbers_v <- qnorm(numbers_v)
+  
   # Replicate x to match the number of rows in numbers
   x_101 <- rep(x, heatmapcut)
   if (is.binary==TRUE){
+    binary<-x
+    average_values<-cbind.data.frame(binary,fresiduals) %>%
+      arrange(binary)%>%
+      group_by(binary)%>%
+      summarise(mean_values=mean(fresiduals))%>%
+      select(mean_values)
+    y0<-qnorm(unlist(average_values[1,1]))
+    y1<-qnorm(unlist(average_values[2,1]))
     x_101<-x_101+runif(length(x_101),min=0,max=0.01)
-  }
+    qnumbers <- cbind.data.frame(x_101, qnumbers_v)
+    numbers <- cbind.data.frame(x_101, numbers_v)
+    
+    p_norm<-ggplot(qnumbers, aes(x_101,qnumbers_v)) +
+      stat_density_2d(aes(fill = stat(level)), geom = 'polygon') +
+      scale_fill_viridis_c(name = "density")+
+      geom_hline(yintercept=0,linetype="dashed", color = "red")+
+      labs(x = xlabs, y=" ")+
+      xlim(xl,xp) + # Set x-axis limits 
+      labs(title = title)+
+      theme(plot.title = element_text(size=12),axis.title=element_text(size=12))
+    segment_df <- data.frame(x = 0, y = y0, xend = 1, yend = y1)
+    p_norm<-p_norm+
+      geom_segment(data=segment_df,aes(x = 0, y = y0, xend = 1, yend = y1),color="#3366CC",size = 1.5)
+  return(p_norm)
+    }
   # Convert the matrix to a vector and then apply the normal quantile transformation
-  numbers_v <- as.vector(numbers)
-  qnumbers_v <- qnorm(numbers_v)
+
   
   # Combine the x11 and transformed values into a data frame
   qnumbers <- cbind.data.frame(x_101, qnumbers_v)
@@ -78,3 +103,4 @@ fresplot <- function(fresiduals,
     # Return the plot
     return(p_norm)
   }}
+
