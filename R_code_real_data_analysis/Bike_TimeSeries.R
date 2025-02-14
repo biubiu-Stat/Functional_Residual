@@ -47,7 +47,7 @@ bikedata <- bikedata %>% mutate(datetime=
 ########################## INGARCH models ######################################
 ##################################################################################
 
-xpart<-bikedata %>% select(weekday,workingday,weathersit,temp,
+xpart<-bikedata %>% dplyr::select(weekday,workingday,weathersit,temp,
                            windspeed,hum,winter)
 
 modeltsnb1<-tsglm(bikedata$cnt,distr="nbinom",model=list(past_obs=1),

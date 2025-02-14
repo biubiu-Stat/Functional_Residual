@@ -183,10 +183,10 @@ overfr2<-fresiduals(pmodel2)
 ####################### Figure S8 Functional-residual-vs-covariate plots and Fn-Fn plots in the presence of over-dispersion.########################
 
 p2_norm<-fresplot(overfr2,px1,title = "(b) Quasi-Poisson model",scale = "normal",
-                  xl=-2.5,xp=2.8)
+                  xl=-2.5,xp=2.8,yl=-3,yp=3)
 
 p1_norm<-fresplot(overfr1,px1,title = "(a) Regular Poisson model",scale = "normal",
-                  xl=-2.5,xp=2.8)
+                  xl=-2.5,xp=2.8,yl=-3,yp=3)
 
 ff1<-ffplot(overfr1,title = "(c) Regular Poisson model")
 ff2<-ffplot(overfr2,title = "(d) Quasi-Poisson model")
