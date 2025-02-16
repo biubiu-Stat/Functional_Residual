@@ -48,7 +48,7 @@ p2<-cbind.data.frame(px1,pearson2)
 p2_unif<-fresplot(fr2,px1,title = "(a) Functional residuals on the uniform scale",scale = "uniform",
                   yl=0,yp=1,xl=-4,xp=4)
 p2_norm<-fresplot(fr2,px1,title = "(b) Functional residuals on the normal scale",scale = "normal",
-                  xl=-4,xp=4)
+                  xl=-4,xp=4,yl=-3,yp=3)
 
 p1_norm_quard<-fresplot(fr1,px1,title = "(a)",scale = "normal",
                         xl=-3,xp=3)
